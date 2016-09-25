@@ -1,0 +1,17 @@
+- name: prometheus config folder
+  file:
+    path:   "{{ item }}"
+    state:  directory
+    mode:   0755
+  with_items:
+  - "/etc/prometheus"
+  - "/etc/prometheus/rules"
+  - "{{prometheus_data_dir}}"
+
+- name: prometheus configs
+  template: src="{{item}}.j2" dest="/{{item}}" mode=0644
+  notify: prometheus service
+  with_items:
+  - "etc/prometheus/prometheus.yml"
+  notify:
+  - restart prometheus

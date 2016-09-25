@@ -1,0 +1,2 @@
+[prometheus_node]
+prometheus ansible_host=127.0.0.1

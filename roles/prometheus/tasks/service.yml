@@ -1,0 +1,13 @@
+- name: prometheus systemd config
+  template:   src="{{item}}.j2" dest="/{{item}}" mode=0644
+  notify:
+  - restart systemd
+  - restart prometheus
+  with_items:
+  - "etc/systemd/system/prometheus.service"
+
+- name: prometheus service
+  service:
+    name:     prometheus
+    state:    started
+    enabled:  yes

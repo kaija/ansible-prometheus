@@ -1,0 +1,7 @@
+---
+- name: prometheus common
+  hosts:
+    - prometheus_node
+  become: yes
+  roles:
+  - { role: prometheus, tags: ['prometheus'] }

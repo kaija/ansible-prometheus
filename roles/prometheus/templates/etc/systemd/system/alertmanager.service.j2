@@ -1,0 +1,16 @@
+[Unit]
+Description=Prometheus metrics service
+After=network.target
+
+[Service]
+User=root
+Group=root
+LimitNOFILE=65536
+EnvironmentFile=-/etc/default/alertmanager
+ExecStart=/usr/local/bin/alertmanager -config.file /etc/prometheus/alertmanager.yml -web.external-url http://127.0.0.1:9093/alert/
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+Alias=prometheus.service

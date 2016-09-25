@@ -1,0 +1,40 @@
+- stat: path="{{prometheus_work_dir}}/alertmanager-{{alertmanager_version}}.linux-amd64.tar.gz"
+  register: alertmanager_bin
+
+- name: download alertmanager bin
+  get_url:
+    url:    "https://github.com/prometheus/alertmanager/releases/download/v{{ alertmanager_version}}/alertmanager-{{ alertmanager_version }}.linux-amd64.tar.gz"
+    dest:   "{{prometheus_work_dir}}"
+    backup: yes
+  when: alertmanager_bin.stat.exists == False
+
+- name: unzip alertmanager bin
+  unarchive:
+    src:    "{{prometheus_work_dir}}/alertmanager-{{alertmanager_version}}.linux-amd64.tar.gz"
+    dest:   "{{prometheus_work_dir}}"
+
+- name: create link
+  file:
+    src:    "{{prometheus_work_dir}}/alertmanager-{{alertmanager_version}}.linux-amd64/alertmanager"
+    dest:   "/usr/local/bin/alertmanager"
+    state:  link
+
+- name: alertmanager configs
+  template: src="{{item}}.j2" dest="/{{item}}" mode=0644
+  with_items:
+  - "etc/prometheus/alertmanager.yml"
+
+
+- name: alertmanager systemd config
+  template:   src="{{item}}.j2" dest="/{{item}}" mode=0644
+  notify:
+  - restart systemd
+  - restart alertmanager
+  with_items:
+  - "etc/systemd/system/alertmanager.service"
+
+- name: alertmanager service
+  service:
+    name:     alertmanager
+    state:    started
+    enabled:  yes

@@ -1,0 +1,16 @@
+[Unit]
+Description=Prometheus metrics service
+After=network.target
+
+[Service]
+User=root
+Group=root
+LimitNOFILE=65536
+EnvironmentFile=-/etc/default/kapacitor
+ExecStart=/usr/local/bin/prometheus -config.file /etc/prometheus/prometheus.yml -storage.local.path {{ prometheus_data_dir }} -storage.local.retention {{ prometheus_data_retention }}h0m0s -web.external-url http://127.0.0.1:9090/prom/  {% if alertmanager_enable %}-alertmanager.url http://127.0.0.1:9093/ {% endif %}  {% if prometheus_influxdb_backend %} -storage.remote.influxdb-url http://127.0.0.1:8083/ {% endif %}
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+Alias=prometheus.service

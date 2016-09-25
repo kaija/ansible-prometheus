@@ -1,0 +1,10 @@
+---
+- include: install.yml
+
+- name: install alertmanager
+  include: alertmanager.yml
+  when: alertmanager_enable==true
+
+- include: configure.yml
+
+- include: service.yml

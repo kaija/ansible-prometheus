@@ -1,0 +1,27 @@
+---
+- stat: path="{{prometheus_work_dir}}/prometheus-{{prometheus_version}}.linux-amd64.tar.gz"
+  register: prometheus_bin
+
+- name: create working folder
+  file:
+    path:   "{{prometheus_work_dir}}"
+    state:  directory
+    mode:   0755
+
+- name: download prometheus bin
+  get_url:
+    url:    "https://github.com/prometheus/prometheus/releases/download/v{{prometheus_version}}/prometheus-{{prometheus_version}}.linux-amd64.tar.gz"
+    dest:   "{{prometheus_work_dir}}"
+    backup: yes
+  when: prometheus_bin.stat.exists == False
+
+- name: unzip prometheus bin
+  unarchive:
+    src:    "{{prometheus_work_dir}}/prometheus-{{prometheus_version}}.linux-amd64.tar.gz"
+    dest:   "{{prometheus_work_dir}}"
+
+- name: create link
+  file:
+    src:    "{{prometheus_work_dir}}/prometheus-{{prometheus_version}}.linux-amd64/prometheus"
+    dest:   "/usr/local/bin/prometheus"
+    state:  link
